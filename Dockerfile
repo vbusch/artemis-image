@@ -1,14 +1,19 @@
-FROM rhel7/rhel
+FROM jboss/base-jdk:8
+
+USER root
 
 RUN yum -y install \
     gettext \
     hostname \
     iputils \
-    java-1.8.0-openjdk \
     libaio \
     python \
     which \
     && yum clean all
+    
+RUN mkdir -p /var/run/artemis/
+
+USER jboss
 
 ARG version=latest
 ENV ARTEMIS_HOME=/opt/apache-artemis-2.0.0-SNAPSHOT PATH=$ARTEMIS_HOME/bin:$PATH VERSION=${version}
@@ -26,7 +31,6 @@ COPY ./activemq-artemis/integration/activemq-amqp-connector/target/artemis-amqp-
 COPY ./utils/* ./artemis-launcher/build/exe/main/main $ARTEMIS_HOME/bin/
 COPY ./config_templates /config_templates
 
-RUN mkdir -p /var/run/artemis/
 VOLUME /var/run/artemis
 
 EXPOSE 5673 61616 8161
